@@ -14,7 +14,7 @@ app.use(express.json())
 // Todoの一覧の取得
 app.get('/api/todos', (req, res) => {
   if (!req.query.completed) {
-    return res.json()
+    return res.json(todos)
   }
   // completedクエリパラメータを指定された場合はToDoをフィルタリング
   const completed = req.query.completed === 'true'
@@ -46,3 +46,17 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(3000)
+
+// Next.jsによるルーティングのためこれ以降を追記
+const next = require('next')
+const dev = process.env.NODE_ENV !== 'production'
+const nextApp = next({ dev })
+
+nextApp.prepare().then(
+  // pagesディレクトリ内の各Reactコンポーネントに対するサーバサイドルーティング
+  () => app.get('*', nextApp.getRequestHandler()),
+  err => {
+    console.error(err)
+    process.exit(1)
+  }
+)
